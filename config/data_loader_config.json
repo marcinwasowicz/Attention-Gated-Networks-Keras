@@ -1,6 +1,11 @@
 {
-  "patients_inputs_dir": "<place here your local path>",
-  "patients_target_dir": "place here your local path",
+  "patients_inputs_dir": "./data/manifest-1599750808610/Pancreas-CT",
+  "patients_target_dir": "./data/TCIA_pancreas_labels-02-05-2017",
   "input_file_ext": ".dcm",
-  "target_file_ext": ".nii"
+  "target_file_ext": ".nii",
+  "batch_size": 2,
+  "random_state": 42,
+  "augmentation_args": {
+    "resize_val": [160, 160, 96]
+  }
 }

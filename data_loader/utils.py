@@ -17,8 +17,10 @@ def get_files_from_dir(path: str, file_ext: str):
 
 
 def load_nii_image(path: str):
-    return np.squeeze(nib.load(path).get_fdata().astype(np.int16))
+    nii_object = nib.load(path)
+    image_array = nii_object.get_fdata()
+    return image_array.astype(np.int16)
 
 
 def load_dcm_image(path: str):
-    return np.squeeze(dcmread(path).pixel_array)
+    return dcmread(path).pixel_array
