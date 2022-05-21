@@ -34,11 +34,42 @@ class DataLoader(tf.keras.utils.Sequence):
             index * self._batch_size : (index + 1) * self._batch_size
         ]
 
-        x = np.array([self._augmentation(self._inputs[i[0]], "input") for i in indices])
-        y = np.array(
-            [self._augmentation(self._targets[i[0]], "target") for i in indices]
+        x = tf.convert_to_tensor(
+            [
+                self._augmentation(
+                    self._get_input_at_index(idx),
+                    "input",
+                )
+                for idx, _path in indices
+            ]
+        )
+        y = tf.convert_to_tensor(
+            [
+                self._augmentation(self._get_target_at_index(idx), "target")
+                for idx, _path in indices
+            ]
         )
         return x, y
+
+    def debug_directory(self, directory_index):
+        num_slices = self._inputs[directory_index].shape[-1]
+        for i in range(num_slices):
+            yield (
+                self._get_input_at_index(directory_index),
+                self._get_target_at_index(directory_index),
+            )
+
+    def _get_input_at_index(self, directory_index):
+        return tf.stack(
+            [
+                load_dcm_image(image_path).T
+                for image_path in self._inputs[directory_index]
+            ],
+            axis=2,
+        )
+
+    def _get_target_at_index(self, directory_index):
+        return load_nii_image(self._targets[directory_index])
 
 
 class DataLoaderFactory:
@@ -65,32 +96,21 @@ class DataLoaderFactory:
             )
         ]
         self._inputs = {
-            directory_index: np.stack(
-                [
-                    load_dcm_image(image_path).T
-                    for image_path in sorted(
-                        get_files_from_dir(patient_input, input_file_ext)
-                    )
-                ],
-                axis=2,
-            )
+            directory_index: [
+                image_path
+                for image_path in sorted(
+                    get_files_from_dir(patient_input, input_file_ext)
+                )
+            ]
             for directory_index, patient_input in self._directories
         }
 
         self._targets = {
-            directory_index: load_nii_image(target_batch_path)
+            directory_index: target_batch_path
             for directory_index, target_batch_path in enumerate(
                 sorted(get_files_from_dir(patients_target_dir, target_file_ext))
             )
         }
-
-    def debug_directory(self, directory_index):
-        num_slices = self._inputs[directory_index].shape[-1]
-        for i in range(num_slices):
-            yield (
-                self._inputs[directory_index][:, :, i],
-                self._targets[directory_index][:, :, i],
-            )
 
     def produce_loaders(self, test_size: float = None, val_size: float = None):
         if not test_size:
