@@ -79,13 +79,15 @@ class DataLoaderFactory:
         patients_target_dir: str,
         input_file_ext: str,
         target_file_ext: str,
-        preprocessing_args: Dict[str, any],
+        input_shape: List[int],
+        num_classes: int,
         batch_size: int,
         random_state: int,
+        **kwargs,
     ):
         self.batch_size = batch_size
         self._random_state = random_state
-        self._preprocessing = Preprocessing(**preprocessing_args)
+        self._preprocessing = Preprocessing(input_shape, num_classes)
         self._directories = [
             (directory_index, directory_path.path)
             for directory_index, directory_path in enumerate(
