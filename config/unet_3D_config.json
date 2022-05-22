@@ -1,0 +1,11 @@
+{
+  "patients_inputs_dir": "./data/manifest-1599750808610/Pancreas-CT",
+  "patients_target_dir": "./data/TCIA_pancreas_labels-02-05-2017",
+  "input_file_ext": ".dcm",
+  "target_file_ext": ".nii",
+  "batch_size": 2,
+  "random_state": 42,
+  "input_shape": [160, 160, 96],
+  "num_classes": 2,
+  "learning_rate": 1e-4
+}

@@ -1,0 +1,6 @@
+black 
+nibabel
+numpy
+pydicom
+sklearn
+tensorflow
