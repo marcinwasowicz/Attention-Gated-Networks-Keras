@@ -3,7 +3,7 @@ from scipy import ndimage
 import tensorflow as tf
 
 
-class Augmentation:
+class Preprocessing:
     _MIN_TISSUE_INTENSITY = -1000
     _MAX_TISSUE_INTENSITY = 400
 

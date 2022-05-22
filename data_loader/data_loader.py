@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import tensorflow as tf
 
-from .augmentation import Augmentation
+from .preprocessing import Preprocessing
 from .utils import get_files_from_dir, load_nii_image, load_dcm_image
 
 
@@ -18,13 +18,13 @@ class DataLoader(tf.keras.utils.Sequence):
         batch_size: int,
         inputs: Dict[int, np.ndarray],
         targets: Dict[int, np.ndarray],
-        augmentation: Augmentation,
+        preprocessing: Preprocessing,
     ):
         self._batch_size = batch_size
         self._directories = directories
         self._inputs = inputs
         self._targets = targets
-        self._augmentation = augmentation
+        self._preprocessing = preprocessing
 
     def __len__(self):
         return math.ceil(len(self._directories) / self._batch_size)
@@ -36,7 +36,7 @@ class DataLoader(tf.keras.utils.Sequence):
 
         x = tf.convert_to_tensor(
             [
-                self._augmentation(
+                self._preprocessing(
                     self._get_input_at_index(idx),
                     "input",
                 )
@@ -45,7 +45,7 @@ class DataLoader(tf.keras.utils.Sequence):
         )
         y = tf.convert_to_tensor(
             [
-                self._augmentation(self._get_target_at_index(idx), "target")
+                self._preprocessing(self._get_target_at_index(idx), "target")
                 for idx, _path in indices
             ]
         )
@@ -79,13 +79,13 @@ class DataLoaderFactory:
         patients_target_dir: str,
         input_file_ext: str,
         target_file_ext: str,
-        augmentation_args: Dict[str, any],
+        preprocessing_args: Dict[str, any],
         batch_size: int,
         random_state: int,
     ):
         self.batch_size = batch_size
         self._random_state = random_state
-        self._augmentation = Augmentation(**augmentation_args)
+        self._preprocessing = Preprocessing(**preprocessing_args)
         self._directories = [
             (directory_index, directory_path.path)
             for directory_index, directory_path in enumerate(
@@ -131,5 +131,5 @@ class DataLoaderFactory:
 
     def _get_loader(self, dirs):
         return DataLoader(
-            dirs, self.batch_size, self._inputs, self._targets, self._augmentation
+            dirs, self.batch_size, self._inputs, self._targets, self._preprocessing
         )
