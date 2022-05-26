@@ -15,7 +15,6 @@ class CheckpointManager(ModelCheckpoint):
         self.path = path_prefix
         self.prediction_freq = prediction_freq
         self.validation_loader = validation_loader
-        self.validation_loader._batch_size = 1
         self._metrics = {}
 
     def on_epoch_end(self, epoch, logs=None):
