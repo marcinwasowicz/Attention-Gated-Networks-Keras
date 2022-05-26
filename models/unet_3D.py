@@ -4,9 +4,8 @@ from .utils import dice_loss
 
 
 class Unet3DFactory:
-    def __init__(self, input_shape, num_classes, learning_rate, **kwargs):
+    def __init__(self, input_shape, learning_rate, **kwargs):
         self.input_shape = tuple(input_shape) + (1,)
-        self.num_classes = num_classes
         self.learning_rate = learning_rate
 
     def produce_unet(self):
@@ -36,9 +35,7 @@ class Unet3DFactory:
                 skeleton.append(layer)
 
         # Final convolution
-        final_conv = layers.Conv3D(self.num_classes, 1, activation="softmax")(
-            skeleton[-1]
-        )
+        final_conv = layers.Conv3D(1, 1, activation="sigmoid")(skeleton[-1])
         skeleton.append(final_conv)
 
         model = models.Model(inputs=skeleton[0], outputs=skeleton[-1])

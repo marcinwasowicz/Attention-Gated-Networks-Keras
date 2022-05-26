@@ -80,14 +80,13 @@ class DataLoaderFactory:
         input_file_ext: str,
         target_file_ext: str,
         input_shape: List[int],
-        num_classes: int,
         batch_size: int,
         random_state: int,
         **kwargs,
     ):
         self.batch_size = batch_size
         self._random_state = random_state
-        self._preprocessing = Preprocessing(input_shape, num_classes)
+        self._preprocessing = Preprocessing(input_shape)
         self._directories = [
             (directory_index, directory_path.path)
             for directory_index, directory_path in enumerate(
