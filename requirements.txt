@@ -3,4 +3,5 @@ nibabel
 numpy
 pydicom
 sklearn
+scipy
 tensorflow
