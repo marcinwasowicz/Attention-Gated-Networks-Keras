@@ -48,7 +48,7 @@ if __name__ == "__main__":
         config = json.load(f)
 
     train_loader, test_loader = DataLoaderFactory(**config).produce_loaders(
-        test_size=0.2
+        test_size=config["test_size"]
     )
     unet = Unet3DFactory(**config).produce_unet()
     checkpoint_manager = CheckpointManager(**config, validation_loader=test_loader)

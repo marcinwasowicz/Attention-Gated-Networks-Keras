@@ -9,6 +9,8 @@
   "learning_rate": 5e-4,
   "use_dice_loss": true,
   "epochs": 1000,
-  "path_prefix": "./training_results/model_0",
-  "prediction_freq": 1
+  "path_prefix": "./training_results/model_5",
+  "prediction_freq": 1,
+  "test_size": 0.25,
+  "sample_fraction": 0.25
 }

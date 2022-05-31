@@ -5,6 +5,7 @@ from typing import List, Dict, Tuple
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
+from sklearn.utils.random import sample_without_replacement
 import tensorflow as tf
 
 from .preprocessing import Preprocessing
@@ -82,6 +83,7 @@ class DataLoaderFactory:
         input_shape: List[int],
         batch_size: int,
         random_state: int,
+        sample_fraction: float = None,
         **kwargs,
     ):
         self.batch_size = batch_size
@@ -96,6 +98,13 @@ class DataLoaderFactory:
                 )
             )
         ]
+        if sample_fraction:
+            sample_size = int(sample_fraction * len(self._directories))
+            selected_indices = sample_without_replacement(
+                len(self._directories), sample_size, random_state=self._random_state
+            )
+            self._directories = [self._directories[i] for i in selected_indices]
+
         self._inputs = {
             directory_index: [
                 image_path
