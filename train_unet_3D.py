@@ -17,6 +17,9 @@ class CheckpointManager(ModelCheckpoint):
         self.validation_loader = validation_loader
         self._metrics = {}
 
+        with open(os.path.join(self.path, "config.json"), "w+") as config_copy_file:
+            json.dump(kwargs, config_copy_file)
+
     def on_epoch_end(self, epoch, logs=None):
         super().on_epoch_end(epoch, logs)
         for k, v in logs.items():

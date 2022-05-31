@@ -2,12 +2,13 @@
   "patients_inputs_dir": "./data/manifest-1599750808610/Pancreas-CT",
   "patients_target_dir": "./data/TCIA_pancreas_labels-02-05-2017",
   "input_file_ext": ".dcm",
-  "target_file_ext": ".nii",
+  "target_file_ext": ".nii.gz",
   "batch_size": 2,
   "random_state": 42,
-  "input_shape": [160, 160, 96],
-  "learning_rate": 1e-4,
+  "input_shape": [80, 80, 48],
+  "learning_rate": 5e-4,
+  "use_dice_loss": true,
   "epochs": 1000,
-  "path_prefix": "./training_results/model_2/model",
+  "path_prefix": "./training_results/model_0",
   "prediction_freq": 1
 }

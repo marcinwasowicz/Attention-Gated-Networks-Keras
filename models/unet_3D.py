@@ -1,12 +1,14 @@
+from matplotlib import use
 from tensorflow.keras import layers, models, optimizers
 
-from .utils import dice_loss
+from .utils import dice_loss, dice_score
 
 
 class Unet3DFactory:
-    def __init__(self, input_shape, learning_rate, **kwargs):
+    def __init__(self, input_shape, learning_rate, use_dice_loss, **kwargs):
         self.input_shape = tuple(input_shape) + (1,)
         self.learning_rate = learning_rate
+        self.use_dice_loss = use_dice_loss
 
     def produce_unet(self):
         skeleton = [layers.Input(self.input_shape)]
@@ -39,7 +41,11 @@ class Unet3DFactory:
         skeleton.append(final_conv)
 
         model = models.Model(inputs=skeleton[0], outputs=skeleton[-1])
-        model.compile(optimizer=optimizers.Adam(self.learning_rate), loss=dice_loss)
+        model.compile(
+            optimizer=optimizers.Adam(self.learning_rate),
+            loss=dice_loss if self.use_dice_loss else "binary_crossentropy",
+            metrics=[dice_score],
+        )
         return model
 
     def _conv_block(self, filter_count, max_pool):
