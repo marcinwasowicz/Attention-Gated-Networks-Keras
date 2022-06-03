@@ -1,4 +1,3 @@
-from matplotlib import use
 from tensorflow.keras import layers, models, optimizers
 
 from .utils import dice_loss, dice_score
@@ -25,6 +24,7 @@ class Unet3DFactory:
 
         # Upsampling
         convolution_ids = [1, 5, 9, 13]
+        upsampling_outputs = []
         for upsample_id, filter_count in enumerate(reversed(filter_counts[:-1])):
             upsampling_layer = layers.UpSampling3D(size=(2, 2, 2))(skeleton[-1])
             skeleton.append(upsampling_layer)
@@ -35,6 +35,23 @@ class Unet3DFactory:
             for layer in self._conv_block(filter_count, False):
                 layer = layer(skeleton[-1])
                 skeleton.append(layer)
+            upsampling_outputs.append(skeleton[-1])
+
+        # Deep Supervision
+        scale_factors = [8, 4, 2, 1]
+        deep_supervision_layers = []
+        for scale_factor, upsampling_output in zip(scale_factors, upsampling_outputs):
+            conv_layer = layers.Conv3D(1, kernel_size=1, strides=1, padding="valid")(
+                upsampling_output
+            )
+            skeleton.append(conv_layer)
+            upsample_layer = layers.UpSampling3D(size=scale_factor)(conv_layer)
+            skeleton.append(upsample_layer)
+            deep_supervision_layers.append(upsample_layer)
+
+        skeleton.append(
+            layers.Concatenate(axis=4)(list(reversed(deep_supervision_layers)))
+        )
 
         # Final convolution
         final_conv = layers.Conv3D(1, 1, activation="sigmoid")(skeleton[-1])
