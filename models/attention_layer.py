@@ -1,5 +1,4 @@
-import tensorflow as tf
-from tensorflow.keras import layers
+from tensorflow.keras import layers, backend
 
 
 class GridAttentionLayer(layers.Layer):
@@ -26,7 +25,6 @@ class GridAttentionLayer(layers.Layer):
         self.psi = layers.Conv3D(1, kernel_size=1, strides=1, padding="valid")
 
     def call(self, input_features, gating_signal):
-        # TODO: not valid
         transformed_input_features = self.theta(input_features)
         transformed_gating_signal = self.phi(gating_signal)
         channels_indexes = [1, 2, 3]
@@ -42,18 +40,20 @@ class GridAttentionLayer(layers.Layer):
         )
         attention = layers.Activation("sigmoid")(self.psi(attention))
         attention_up_sample_size = [
-            input_features.shape[i] // attention.shape[i] for i in channels_indexes]
+            input_features.shape[i] // attention.shape[i] for i in channels_indexes
+        ]
         attention = layers.UpSampling3D(size=tuple(attention_up_sample_size))(attention)
+        attention = backend.repeat_elements(attention, input_features.shape[4], axis=4)
         attention_padding = [
             (0, input_features.shape[i] % attention.shape[i]) for i in channels_indexes
         ]
-        attention = layers.ZeroPadding3D(padding=tuple(attention_padding))(attention)
-        gate = tf.broadcast_to(attention, input_features.shape) * input_features
+        attention = layers.ZeroPadding3D(padding=attention_padding)(attention)
+        gate = attention * input_features
 
         for output_transform_layer in self.output_transform:
             gate = output_transform_layer(gate)
 
-        return gate, attention
+        return gate
 
 
 class AttentionLayer(layers.Layer):
@@ -69,7 +69,7 @@ class AttentionLayer(layers.Layer):
         ]
 
     def call(self, input_features, gating_signal):
-        gate, _attention = self.grid_attention_block(input_features, gating_signal)
+        gate = self.grid_attention_block(input_features, gating_signal)
         for combine_layer in self.combine_layers:
             gate = combine_layer(gate)
         return gate

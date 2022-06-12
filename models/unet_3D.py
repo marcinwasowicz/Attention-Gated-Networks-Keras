@@ -61,9 +61,9 @@ class Unet3D(models.Model):
             gating = self.gating(center)
             g_conv4 = self.attention_block3(conv4, gating)
             up4 = self.up4(g_conv4, center)
-            g_conv3 = self.attention_block3(conv3, up4)
+            g_conv3 = self.attention_block2(conv3, up4)
             up3 = self.up3(g_conv3, up4)
-            g_conv2 = self.attention_block3(conv2, up3)
+            g_conv2 = self.attention_block1(conv2, up3)
             up2 = self.up2(g_conv2, up3)
             up1 = self.up1(conv1, up2)
         else:
