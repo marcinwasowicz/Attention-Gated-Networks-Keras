@@ -8,8 +8,9 @@
   "input_shape": [80, 80, 48],
   "learning_rate": 5e-4,
   "use_dice_loss": true,
+  "use_attention": false,
   "epochs": 1000,
-  "path_prefix": "./training_results/model_5",
+  "path_prefix": "./training_results/model_0",
   "prediction_freq": 1,
   "test_size": 0.25,
   "sample_fraction": 0.25
