@@ -130,3 +130,6 @@ dmypy.json
 
 # datasets directories
 data/*
+
+# model persistence
+training_results/*
