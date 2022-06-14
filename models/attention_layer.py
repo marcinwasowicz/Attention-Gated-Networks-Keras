@@ -5,10 +5,11 @@ class GridAttentionLayer(layers.Layer):
     def __init__(self, input_size, inter_size, sub_sample_factor):
         super().__init__()
         self.sub_sample_factor = sub_sample_factor
-        self.output_transform = [
-            layers.Conv3D(input_size, kernel_size=1, strides=1, padding="valid"),
-            layers.BatchNormalization(),
-        ]
+
+        self.output_transform_conv = layers.Conv3D(
+            input_size, kernel_size=1, strides=1, padding="valid"
+        )
+        self.output_transform_batch_norm = layers.BatchNormalization()
         self.theta = layers.Conv3D(
             inter_size,
             kernel_size=sub_sample_factor,
@@ -49,10 +50,8 @@ class GridAttentionLayer(layers.Layer):
         ]
         attention = layers.ZeroPadding3D(padding=attention_padding)(attention)
         gate = attention * input_features
-
-        for output_transform_layer in self.output_transform:
-            gate = output_transform_layer(gate)
-
+        gate = self.output_transform_conv(gate)
+        gate = self.output_transform_batch_norm(gate)
         return gate
 
 
